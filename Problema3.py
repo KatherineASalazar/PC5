@@ -26,3 +26,56 @@
 # Puede emplear funciones y/o clases
 # Integrar los módulos y tomar captura al menos de uno de los correos enviados mediante 
 # código
+
+
+import pandas as pd
+from sqlalchemy import create_engine
+
+def limpiar_datos(df):
+    # Renombrar columnas
+    df.columns = df.columns.str.lower().str.replace(' ', '_').str.replace('á', 'a').str.replace('é', 'e').str.replace('í', 'i').str.replace('ó', 'o').str.replace('ú', 'u')
+    
+    # Eliminar columnas duplicadas
+    df = df.loc[:,~df.columns.duplicated()]
+    
+    # Eliminar coma del texto en la columna "DISPOSITIVO_LEGAL"
+    df['dispositivo_legal'] = df['dispositivo_legal'].str.replace(',', '')
+    
+    # Dolarizar los montos de inversión y transferencia
+    
+    # Cambiar valores de la columna "Estado"
+    
+    # Crear nueva columna de puntuación del estado
+    
+    return df
+
+
+
+def almacenar_ubigeos(df):
+    # Almacenar tabla de ubigeos en una base de datos
+    engine = create_engine('sqlite:///ubigeos.db', echo=False)
+    df_ubigeos = df[['ubigeo', 'region', 'provincia', 'distrito']].drop_duplicates()
+    df_ubigeos.to_sql('ubigeos', con=engine, if_exists='replace', index=False)
+
+def generar_reportes_por_region(df):
+    # Generar reportes por región en archivos Excel
+    regiones = df['region'].unique()
+    for region in regiones:
+        df_region = df[df['region'] == region]
+        # Realizar el procesamiento para obtener el top 5 de costos de inversión y generar el Excel
+
+def main():
+    # Cargar el archivo de Excel
+    df = pd.read_excel('reactiva.xlsx')
+    
+    # Realizar limpieza de datos
+    df_limpiado = limpiar_datos(df)
+    
+    # Almacenar tabla de ubigeos en una base de datos
+    almacenar_ubigeos(df_limpiado)
+    
+    # Generar reportes por región en archivos Excel
+    generar_reportes_por_region(df_limpiado)
+
+if __name__ == "__main__":
+    main()
